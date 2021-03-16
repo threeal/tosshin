@@ -1,3 +1,3 @@
-# Tosshin
+# Tosshin Interfaces
 
-Movement tools for ROS 2.
+A ROS 2 interfaces for Tosshin movement package.
