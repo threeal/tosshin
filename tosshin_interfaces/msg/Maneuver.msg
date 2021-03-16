@@ -1,3 +1,3 @@
-float32[<=1] forward
-float32[<=1] right
-float32[<=1] yaw
+float64[<=1] forward
+float64[<=1] left
+float64[<=1] yaw
