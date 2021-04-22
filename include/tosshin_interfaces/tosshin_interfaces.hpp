@@ -22,8 +22,11 @@
 #define TOSSHIN_INTERFACES__TOSSHIN_INTERFACES_HPP_
 
 #include <tosshin_interfaces/msg/maneuver.hpp>
+#include <tosshin_interfaces/msg/odometry.hpp>
 #include <tosshin_interfaces/msg/orientation.hpp>
 #include <tosshin_interfaces/msg/position.hpp>
+
 #include <tosshin_interfaces/srv/configure_maneuver.hpp>
+#include <tosshin_interfaces/srv/configure_odometry.hpp>
 
 #endif  // TOSSHIN_INTERFACES__TOSSHIN_INTERFACES_HPP_

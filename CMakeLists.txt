@@ -19,9 +19,11 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Maneuver.msg"
+  "msg/Odometry.msg"
   "msg/Orientation.msg"
   "msg/Position.msg"
-  "srv/ConfigureManeuver.srv")
+  "srv/ConfigureManeuver.srv"
+  "srv/ConfigureOdometry.srv")
 
 install(DIRECTORY "include" DESTINATION ".")
 
