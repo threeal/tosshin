@@ -1,12 +1,12 @@
-# Tosshin Interfaces
+# Tosshin (突進)
 
-[![latest version](https://img.shields.io/github/v/release/threeal/tosshin_interfaces)](https://github.com/threeal/tosshin_interfaces/releases/)
-[![commits since latest version](https://img.shields.io/github/commits-since/threeal/tosshin_interfaces/latest)](https://github.com/threeal/tosshin_interfaces/commits/master)
-[![milestone](https://img.shields.io/github/milestones/progress/threeal/tosshin_interfaces/1?label=milestone)](https://github.com/threeal/tosshin_interfaces/milestone/1)
-[![license](https://img.shields.io/github/license/threeal/tosshin_interfaces)](./LICENSE)
-[![test status](https://img.shields.io/github/workflow/status/threeal/tosshin_interfaces/Build%20and%20Test?label=test)](https://github.com/threeal/tosshin_interfaces/actions)
+[![latest version](https://img.shields.io/github/v/release/threeal/tosshin)](https://github.com/threeal/tosshin/releases/)
+[![commits since latest version](https://img.shields.io/github/commits-since/threeal/tosshin/latest)](https://github.com/threeal/tosshin/commits/master)
+[![milestone](https://img.shields.io/github/milestones/progress/threeal/tosshin/1?label=milestone)](https://github.com/threeal/tosshin/milestone/1)
+[![license](https://img.shields.io/github/license/threeal/tosshin)](./LICENSE)
+[![test status](https://img.shields.io/github/workflow/status/threeal/tosshin/Build%20and%20Test?label=test)](https://github.com/threeal/tosshin/actions)
 
-This package provides a [ROS 2 interfaces](https://docs.ros.org/en/foxy/Concepts/About-ROS-Interfaces.html) for [Tosshin](https://github.com/threeal/tosshin) mobile robot navigation package.
+Tosshin (突進, rush) is a [ROS 2](https://docs.ros.org/en/foxy/index.html) project that provides mobile robot navigation packages.
 
 ## License
 
