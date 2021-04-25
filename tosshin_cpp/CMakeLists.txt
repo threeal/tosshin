@@ -15,10 +15,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(tosshin_interfaces REQUIRED)
+
+install(DIRECTORY "include" DESTINATION ".")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_dependencies(rclcpp tosshin_interfaces)
+ament_export_include_directories("include")
 
 ament_package()
