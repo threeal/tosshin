@@ -18,13 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__NAVIGATION_PROVIDER_HPP_
-#define TOSSHIN_CPP__NAVIGATION_PROVIDER_HPP_
+#ifndef TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_
+#define TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
+
+#include "../utility.hpp"
 
 namespace tosshin_cpp
 {
@@ -173,4 +174,4 @@ const Maneuver & NavigationProvider::get_maneuver()
 
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__NAVIGATION_PROVIDER_HPP_
+#endif  // TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_

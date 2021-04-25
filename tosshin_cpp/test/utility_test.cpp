@@ -18,12 +18,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__TOSSHIN_CPP_HPP_
-#define TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+#include <gtest/gtest.h>
+#include <keisan/keisan.hpp>
+#include <tosshin_cpp/tosshin_cpp.hpp>
 
-#include "./navigation/navigation_consumer.hpp"
-#include "./navigation/navigation_provider.hpp"
+TEST(UtilityTest, PositionToPoint) {
+  tosshin_cpp::Position position;
 
-#include "./utility.hpp"
+  position.x = 3.5;
+  position.y = 7.8;
 
-#endif  // TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+  auto point = tosshin_cpp::position_to_point(position);
+
+  ASSERT_DOUBLE_EQ(point.x, position.x);
+  ASSERT_DOUBLE_EQ(point.y, position.y);
+}
+
+TEST(UtilityTest, PointToPosition) {
+  keisan::Point2 point(3.5, 7.8);
+
+  auto position = tosshin_cpp::point_to_position(point);
+
+  ASSERT_DOUBLE_EQ(position.x, point.x);
+  ASSERT_DOUBLE_EQ(position.y, point.y);
+}

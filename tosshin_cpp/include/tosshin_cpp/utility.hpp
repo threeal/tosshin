@@ -18,10 +18,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <gtest/gtest.h>
-#include <tosshin_cpp/tosshin_cpp.hpp>
+#ifndef TOSSHIN_CPP__UTILITY_HPP_
+#define TOSSHIN_CPP__UTILITY_HPP_
 
-TEST(HeaderTest, All) {
-  tosshin_cpp::NavigationConsumer navigation_consumer;
-  tosshin_cpp::NavigationProvider navigation_provider;
+#include <keisan/keisan.hpp>
+#include <tosshin_interfaces/tosshin_interfaces.hpp>
+
+namespace tosshin_cpp
+{
+
+using Maneuver = tosshin_interfaces::msg::Maneuver;
+using Odometry = tosshin_interfaces::msg::Odometry;
+using Orientation = tosshin_interfaces::msg::Orientation;
+using Position = tosshin_interfaces::msg::Position;
+using ConfigureOdometry = tosshin_interfaces::srv::ConfigureOdometry;
+using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
+
+keisan::Point2 position_to_point(const Position & position)
+{
+  return keisan::Point2(position.x, position.y);
 }
+
+Position point_to_position(const keisan::Point2 & point)
+{
+  Position position;
+
+  position.x = point.x;
+  position.y = point.y;
+
+  return position;
+}
+
+}  // namespace tosshin_cpp
+
+#endif  // TOSSHIN_CPP__UTILITY_HPP_
