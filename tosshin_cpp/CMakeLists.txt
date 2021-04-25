@@ -21,7 +21,19 @@ find_package(tosshin_interfaces REQUIRED)
 install(DIRECTORY "include" DESTINATION ".")
 
 if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)
+
+  ament_add_gtest(${PROJECT_NAME}_tests
+    "test/compile_test.cpp")
+
+  target_include_directories(${PROJECT_NAME}_tests PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+  ament_target_dependencies(${PROJECT_NAME}_tests
+    rclcpp tosshin_interfaces)
+
   ament_lint_auto_find_test_dependencies()
 endif()
 
