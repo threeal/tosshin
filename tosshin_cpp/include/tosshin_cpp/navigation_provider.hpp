@@ -25,7 +25,6 @@
 #include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
-#include <string>
 
 namespace tosshin_cpp
 {
@@ -49,6 +48,7 @@ protected:
   void set_maneuver(const Maneuver & maneuver);
 
   rclcpp::Node::SharedPtr get_node();
+
   const Maneuver & get_maneuver();
 
 private:
@@ -158,7 +158,7 @@ void NavigationProvider::set_odometry(const Odometry & odometry)
 void NavigationProvider::set_maneuver(const Maneuver & maneuver)
 {
   current_maneuver = configure_maneuver(maneuver);
-  // maneuver_event_publisher->publish(current_maneuver);
+  maneuver_event_publisher->publish(current_maneuver);
 }
 
 rclcpp::Node::SharedPtr NavigationProvider::get_node()

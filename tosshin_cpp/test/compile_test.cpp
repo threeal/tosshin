@@ -22,5 +22,6 @@
 #include <tosshin_cpp/tosshin_cpp.hpp>
 
 TEST(HeaderTest, All) {
+  tosshin_cpp::NavigationConsumer navigation_consumer;
   tosshin_cpp::NavigationProvider navigation_provider;
 }

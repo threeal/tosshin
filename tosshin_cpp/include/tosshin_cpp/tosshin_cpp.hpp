@@ -21,6 +21,7 @@
 #ifndef TOSSHIN_CPP__TOSSHIN_CPP_HPP_
 #define TOSSHIN_CPP__TOSSHIN_CPP_HPP_
 
+#include "./navigation_consumer.hpp"
 #include "./navigation_provider.hpp"
 
 #endif  // TOSSHIN_CPP__TOSSHIN_CPP_HPP_
