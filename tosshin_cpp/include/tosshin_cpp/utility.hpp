@@ -34,12 +34,12 @@ using Position = tosshin_interfaces::msg::Position;
 using ConfigureOdometry = tosshin_interfaces::srv::ConfigureOdometry;
 using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
 
-keisan::Point2 position_to_point(const Position & position)
+inline keisan::Point2 position_to_point(const Position & position)
 {
   return keisan::Point2(position.x, position.y);
 }
 
-Position point_to_position(const keisan::Point2 & point)
+inline Position point_to_position(const keisan::Point2 & point)
 {
   Position position;
 

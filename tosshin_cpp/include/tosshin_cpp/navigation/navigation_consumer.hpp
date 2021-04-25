@@ -22,28 +22,34 @@
 #define TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
-
-#include "../utility.hpp"
 
 namespace tosshin_cpp
 {
 
+using Maneuver = tosshin_interfaces::msg::Maneuver;
+using Odometry = tosshin_interfaces::msg::Odometry;
+using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
+
 class NavigationConsumer
 {
 public:
-  NavigationConsumer();
-  explicit NavigationConsumer(rclcpp::Node::SharedPtr node);
+  inline NavigationConsumer();
+  inline explicit NavigationConsumer(rclcpp::Node::SharedPtr node);
 
-  void set_node(rclcpp::Node::SharedPtr node);
+  inline void set_node(rclcpp::Node::SharedPtr node);
 
-  void set_maneuver(const Maneuver & maneuver);
+  inline const Maneuver & configure_maneuver(const Maneuver & maneuver);
+  inline const Maneuver & configure_maneuver_to_stop();
 
-  rclcpp::Node::SharedPtr get_node();
+  inline void set_maneuver(const Maneuver & maneuver);
 
-  const Odometry & get_odometry();
-  const Maneuver & get_maneuver();
+  inline rclcpp::Node::SharedPtr get_node();
+
+  inline const Odometry & get_odometry();
+  inline const Maneuver & get_maneuver();
 
 private:
   rclcpp::Node::SharedPtr node;
@@ -130,7 +136,7 @@ void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
 
     // Request maneuver data
     {
-      if (configure_maneuver_client->service_is_ready()) {
+      if (configure_maneuver_client->wait_for_service(std::chrono::seconds(1))) {
         auto request = std::make_shared<ConfigureManeuver::Request>();
 
         configure_maneuver_client->async_send_request(
@@ -140,15 +146,50 @@ void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
               current_maneuver = response->maneuver.front();
             }
           });
+      } else {
       }
     }
   }
 }
 
+const Maneuver & NavigationConsumer::configure_maneuver(const Maneuver & maneuver)
+{
+  if (!configure_maneuver_client->wait_for_service(std::chrono::seconds(1))) {
+    throw std::runtime_error("configure maneuver service is not ready");
+  }
+
+  auto request = std::make_shared<ConfigureManeuver::Request>();
+  request->maneuver.push_back(maneuver);
+
+  auto future = configure_maneuver_client->async_send_request(request);
+  if (rclcpp::spin_until_future_complete(get_node(), future) != rclcpp::FutureReturnCode::SUCCESS) {
+    throw std::runtime_error("failed to call configure maneuver service");
+  }
+
+  auto response = future.get();
+  if (response->maneuver.size() < 1) {
+    throw std::runtime_error("maneuver not configured");
+  }
+
+  current_maneuver = response->maneuver.front();
+
+  return current_maneuver;
+}
+
+const Maneuver & NavigationConsumer::configure_maneuver_to_stop()
+{
+  Maneuver maneuver;
+
+  maneuver.forward = 0.0;
+  maneuver.left = 0.0;
+  maneuver.yaw = 0.0;
+
+  return configure_maneuver(maneuver);
+}
+
 void NavigationConsumer::set_maneuver(const Maneuver & maneuver)
 {
-  current_maneuver = maneuver;
-  maneuver_input_publisher->publish(current_maneuver);
+  maneuver_input_publisher->publish(maneuver);
 }
 
 rclcpp::Node::SharedPtr NavigationConsumer::get_node()
