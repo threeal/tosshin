@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
-#define TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
+#ifndef TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_
+#define TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <tosshin_interfaces/tosshin_interfaces.hpp>
@@ -209,4 +209,4 @@ const Maneuver & NavigationConsumer::get_maneuver()
 
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
+#endif  // TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_
