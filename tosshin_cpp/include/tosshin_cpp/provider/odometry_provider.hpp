@@ -35,9 +35,11 @@ class OdometryProvider
 {
 public:
   inline OdometryProvider();
-  inline explicit OdometryProvider(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit OdometryProvider(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline void set_odometry(const Odometry & odometry);
 
@@ -53,19 +55,19 @@ OdometryProvider::OdometryProvider()
 {
 }
 
-OdometryProvider::OdometryProvider(rclcpp::Node::SharedPtr node)
+OdometryProvider::OdometryProvider(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void OdometryProvider::set_node(rclcpp::Node::SharedPtr node)
+void OdometryProvider::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
 
   // Initialize the odometry publisher
   {
-    odometry_publisher = get_node()->create_publisher<Odometry>("navigation/odometry", 10);
+    odometry_publisher = get_node()->create_publisher<Odometry>(root_name + "/odometry", 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),

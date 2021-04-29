@@ -23,6 +23,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <string>
+
 #include "./maneuver_consumer.hpp"
 #include "./odometry_consumer.hpp"
 
@@ -33,9 +35,11 @@ class NavigationConsumer : public OdometryConsumer, public ManeuverConsumer
 {
 public:
   inline NavigationConsumer();
-  inline explicit NavigationConsumer(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit NavigationConsumer(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline rclcpp::Node::SharedPtr get_node() const;
 
@@ -47,19 +51,19 @@ NavigationConsumer::NavigationConsumer()
 {
 }
 
-NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node)
+NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
+void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
 
   // Set parents's node
-  OdometryConsumer::set_node(get_node());
-  ManeuverConsumer::set_node(get_node());
+  OdometryConsumer::set_node(get_node(), root_name);
+  ManeuverConsumer::set_node(get_node(), root_name);
 }
 
 rclcpp::Node::SharedPtr NavigationConsumer::get_node() const

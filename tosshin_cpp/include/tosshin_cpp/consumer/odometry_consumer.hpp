@@ -24,6 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
+#include <string>
 
 #include "../utility.hpp"
 
@@ -36,9 +37,11 @@ public:
   using OnChangeOdometry = std::function<void (const Odometry &)>;
 
   inline OdometryConsumer();
-  inline explicit OdometryConsumer(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit OdometryConsumer(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline void set_on_change_odometry(const OnChangeOdometry & callback);
 
@@ -62,12 +65,12 @@ OdometryConsumer::OdometryConsumer()
 {
 }
 
-OdometryConsumer::OdometryConsumer(rclcpp::Node::SharedPtr node)
+OdometryConsumer::OdometryConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void OdometryConsumer::set_node(rclcpp::Node::SharedPtr node)
+void OdometryConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
@@ -75,7 +78,7 @@ void OdometryConsumer::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the odometry subscription
   {
     odometry_subscription = get_node()->create_subscription<Odometry>(
-      "navigation/odometry", 10,
+      root_name + "/odometry", 10,
       [this](const Odometry::SharedPtr msg) {
         change_odometry(*msg);
       });

@@ -24,6 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
+#include <string>
 
 #include "../utility.hpp"
 
@@ -36,9 +37,11 @@ public:
   using OnChangeManeuver = std::function<void (const Maneuver &)>;
 
   inline ManeuverConsumer();
-  inline explicit ManeuverConsumer(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit ManeuverConsumer(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline void set_on_change_maneuver(const OnChangeManeuver & callback);
 
@@ -70,12 +73,12 @@ ManeuverConsumer::ManeuverConsumer()
 {
 }
 
-ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node)
+ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node)
+void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
@@ -83,7 +86,7 @@ void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the maneuver event subscription
   {
     maneuver_event_subscription = get_node()->create_subscription<Maneuver>(
-      "/navigation/maneuver_event", 10,
+      root_name + "/maneuver_event", 10,
       [this](const Maneuver::SharedPtr msg) {
         change_maneuver(*msg);
       });
@@ -97,7 +100,7 @@ void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the maneuver input publisher
   {
     maneuver_input_publisher = get_node()->create_publisher<Maneuver>(
-      "/navigation/maneuver_input", 10);
+      root_name + "/maneuver_input", 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
@@ -108,7 +111,7 @@ void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the configure maneuver client
   {
     configure_maneuver_client = get_node()->create_client<ConfigureManeuver>(
-      "/navigation/configure_maneuver");
+      root_name + "/configure_maneuver");
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
