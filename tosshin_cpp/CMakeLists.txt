@@ -26,6 +26,7 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
 
   ament_add_gtest(${PROJECT_NAME}_tests
+    "test/compile_test.cpp"
     "test/utility_test.cpp")
 
   target_include_directories(${PROJECT_NAME}_tests PUBLIC
