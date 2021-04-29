@@ -18,58 +18,73 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__PROVIDER__NAVIGATION_PROVIDER_HPP_
-#define TOSSHIN_CPP__PROVIDER__NAVIGATION_PROVIDER_HPP_
+#ifndef TOSSHIN_CPP__PROVIDER__ODOMETRY_PROVIDER_HPP_
+#define TOSSHIN_CPP__PROVIDER__ODOMETRY_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
+#include <string>
 
-#include "./maneuver_provider.hpp"
-#include "./odometry_provider.hpp"
+#include "./utility"
 
 namespace tosshin_cpp
 {
 
-class NavigationProvider : public ManeuverProvider, public OdometryProvider
+class OdometryProvider
 {
 public:
-  inline NavigationProvider();
-  inline explicit NavigationProvider(rclcpp::Node::SharedPtr node);
+  inline OdometryProvider();
+  inline explicit OdometryProvider(rclcpp::Node::SharedPtr node);
 
   inline void set_node(rclcpp::Node::SharedPtr node);
+
+  inline void set_odometry(const Odometry & odometry);
 
   inline rclcpp::Node::SharedPtr get_node();
 
 private:
   rclcpp::Node::SharedPtr node;
+
+  rclcpp::Publisher<Odometry>::SharedPtr odometry_publisher;
 };
 
-NavigationProvider::NavigationProvider()
+OdometryProvider::OdometryProvider()
 {
 }
 
-NavigationProvider::NavigationProvider(rclcpp::Node::SharedPtr node)
+OdometryProvider::OdometryProvider(rclcpp::Node::SharedPtr node)
 {
   set_node(node);
 }
 
-void NavigationProvider::set_node(rclcpp::Node::SharedPtr node)
+void OdometryProvider::set_node(rclcpp::Node::SharedPtr node)
 {
   // Initialize the node
   this->node = node;
 
-  // Set parent node
-  ManeuverProvider::set_node(get_node());
-  OdometryProvider::set_node(get_node());
+  // Initialize the odometry publisher
+  {
+    odometry_publisher = this->node->create_publisher<Odometry>("navigation/odometry", 10);
+
+    RCLCPP_INFO_STREAM(
+      this->node->get_logger(),
+      "Odometry publisher initialized on " <<
+        odometry_publisher->get_topic_name() << "!");
+  }
 }
 
-rclcpp::Node::SharedPtr NavigationProvider::get_node()
+rclcpp::Node::SharedPtr OdometryProvider::get_node()
 {
   return node;
 }
 
+void OdometryProvider::set_odometry(const Odometry & odometry)
+{
+  odometry_publisher->publish(odometry);
+}
+
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__PROVIDER__NAVIGATION_PROVIDER_HPP_
+#endif  // TOSSHIN_CPP__PROVIDER__ODOMETRY_PROVIDER_HPP_

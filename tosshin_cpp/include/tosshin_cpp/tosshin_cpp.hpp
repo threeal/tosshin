@@ -23,7 +23,9 @@
 
 #include "./consumer/navigation_consumer.hpp"
 
+#include "./provider/maneuver_provider.hpp"
 #include "./provider/navigation_provider.hpp"
+#include "./provider/odometry_provider.hpp"
 
 #include "./utility.hpp"
 
