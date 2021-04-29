@@ -22,7 +22,6 @@
 #define TOSSHIN_CPP__PROVIDER__NAVIGATION_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
 
@@ -32,7 +31,7 @@
 namespace tosshin_cpp
 {
 
-class NavigationProvider : public ManeuverProvider, public OdometryProvider
+class NavigationProvider : public OdometryProvider, public ManeuverProvider
 {
 public:
   inline NavigationProvider();
@@ -40,7 +39,7 @@ public:
 
   inline void set_node(rclcpp::Node::SharedPtr node);
 
-  inline rclcpp::Node::SharedPtr get_node();
+  inline rclcpp::Node::SharedPtr get_node() const;
 
 private:
   rclcpp::Node::SharedPtr node;
@@ -60,12 +59,12 @@ void NavigationProvider::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the node
   this->node = node;
 
-  // Set parent node
-  ManeuverProvider::set_node(get_node());
+  // Set parents's node
   OdometryProvider::set_node(get_node());
+  ManeuverProvider::set_node(get_node());
 }
 
-rclcpp::Node::SharedPtr NavigationProvider::get_node()
+rclcpp::Node::SharedPtr NavigationProvider::get_node() const
 {
   return node;
 }

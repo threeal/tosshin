@@ -22,7 +22,6 @@
 #define TOSSHIN_CPP__PROVIDER__ODOMETRY_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
 #include <string>
@@ -42,7 +41,7 @@ public:
 
   inline void set_odometry(const Odometry & odometry);
 
-  inline rclcpp::Node::SharedPtr get_node();
+  inline rclcpp::Node::SharedPtr get_node() const;
 
 private:
   rclcpp::Node::SharedPtr node;
@@ -66,23 +65,23 @@ void OdometryProvider::set_node(rclcpp::Node::SharedPtr node)
 
   // Initialize the odometry publisher
   {
-    odometry_publisher = this->node->create_publisher<Odometry>("navigation/odometry", 10);
+    odometry_publisher = get_node()->create_publisher<Odometry>("navigation/odometry", 10);
 
     RCLCPP_INFO_STREAM(
-      this->node->get_logger(),
+      get_node()->get_logger(),
       "Odometry publisher initialized on " <<
         odometry_publisher->get_topic_name() << "!");
   }
 }
 
-rclcpp::Node::SharedPtr OdometryProvider::get_node()
-{
-  return node;
-}
-
 void OdometryProvider::set_odometry(const Odometry & odometry)
 {
   odometry_publisher->publish(odometry);
+}
+
+rclcpp::Node::SharedPtr OdometryProvider::get_node() const
+{
+  return node;
 }
 
 }  // namespace tosshin_cpp

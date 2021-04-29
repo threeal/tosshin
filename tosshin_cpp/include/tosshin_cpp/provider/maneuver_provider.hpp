@@ -22,7 +22,6 @@
 #define TOSSHIN_CPP__PROVIDER__MANEUVER_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
 
@@ -34,20 +33,20 @@ namespace tosshin_cpp
 class ManeuverProvider
 {
 public:
-  using OnManeuverConfigured = std::function<const Maneuver & (const Maneuver &)>;
+  using OnConfigureManeuver = std::function<const Maneuver & (const Maneuver &)>;
 
   inline ManeuverProvider();
   inline explicit ManeuverProvider(rclcpp::Node::SharedPtr node);
 
   inline void set_node(rclcpp::Node::SharedPtr node);
 
-  inline void set_on_configure_maneuver(const OnManeuverConfigured & callback);
+  inline void set_on_configure_maneuver(const OnConfigureManeuver & callback);
 
   inline void set_maneuver(const Maneuver & maneuver);
 
-  inline rclcpp::Node::SharedPtr get_node();
+  inline rclcpp::Node::SharedPtr get_node() const;
 
-  inline const Maneuver & get_maneuver();
+  inline const Maneuver & get_maneuver() const;
 
 private:
   rclcpp::Node::SharedPtr node;
@@ -57,7 +56,7 @@ private:
 
   rclcpp::Service<ConfigureManeuver>::SharedPtr configure_maneuver_service;
 
-  OnManeuverConfigured on_configure_maneuver;
+  OnConfigureManeuver on_configure_maneuver;
 
   Maneuver current_maneuver;
 };
@@ -78,32 +77,32 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
 
   // Initialize the maneuver event publisher
   {
-    maneuver_event_publisher = this->node->create_publisher<Maneuver>(
+    maneuver_event_publisher = get_node()->create_publisher<Maneuver>(
       "/navigation/maneuver_event", 10);
 
     RCLCPP_INFO_STREAM(
-      this->node->get_logger(),
+      get_node()->get_logger(),
       "Maneuver event publisher initialized on " <<
         maneuver_event_publisher->get_topic_name() << "!");
   }
 
   // Initialize the maneuver input subscription
   {
-    maneuver_input_subscription = this->node->create_subscription<Maneuver>(
+    maneuver_input_subscription = get_node()->create_subscription<Maneuver>(
       "/navigation/maneuver_input", 10,
       [this](const Maneuver::SharedPtr maneuver) {
         set_maneuver(*maneuver);
       });
 
     RCLCPP_INFO_STREAM(
-      this->node->get_logger(),
+      get_node()->get_logger(),
       "Maneuver input subscription initialized on " <<
         maneuver_input_subscription->get_topic_name() << "!");
   }
 
   // Initialize the configure maneuver service
   {
-    configure_maneuver_service = this->node->create_service<ConfigureManeuver>(
+    configure_maneuver_service = get_node()->create_service<ConfigureManeuver>(
       "/navigation/configure_maneuver",
       [this](ConfigureManeuver::Request::SharedPtr request,
       ConfigureManeuver::Response::SharedPtr response) {
@@ -121,14 +120,14 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
       });
 
     RCLCPP_INFO_STREAM(
-      this->node->get_logger(),
+      get_node()->get_logger(),
       "Configure maneuver service initialized on " <<
         configure_maneuver_service->get_service_name() << "!");
   }
 }
 
 void ManeuverProvider::set_on_configure_maneuver(
-  const ManeuverProvider::OnManeuverConfigured & callback)
+  const ManeuverProvider::OnConfigureManeuver & callback)
 {
   on_configure_maneuver = callback;
 }
@@ -144,12 +143,12 @@ void ManeuverProvider::set_maneuver(const Maneuver & maneuver)
   maneuver_event_publisher->publish(current_maneuver);
 }
 
-rclcpp::Node::SharedPtr ManeuverProvider::get_node()
+rclcpp::Node::SharedPtr ManeuverProvider::get_node() const
 {
   return node;
 }
 
-const Maneuver & ManeuverProvider::get_maneuver()
+const Maneuver & ManeuverProvider::get_maneuver() const
 {
   return current_maneuver;
 }

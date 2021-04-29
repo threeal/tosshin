@@ -21,7 +21,9 @@
 #ifndef TOSSHIN_CPP__TOSSHIN_CPP_HPP_
 #define TOSSHIN_CPP__TOSSHIN_CPP_HPP_
 
+#include "./consumer/maneuver_consumer.hpp"
 #include "./consumer/navigation_consumer.hpp"
+#include "./consumer/odometry_consumer.hpp"
 
 #include "./provider/maneuver_provider.hpp"
 #include "./provider/navigation_provider.hpp"

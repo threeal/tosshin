@@ -22,8 +22,10 @@
 #include <tosshin_cpp/tosshin_cpp.hpp>
 
 TEST(CompileTest, All) {
+  tosshin_cpp::ManeuverConsumer();
   tosshin_cpp::ManeuverProvider();
   tosshin_cpp::NavigationConsumer();
   tosshin_cpp::NavigationProvider();
+  tosshin_cpp::OdometryConsumer();
   tosshin_cpp::OdometryProvider();
 }
