@@ -24,6 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
+#include <string>
 
 #include "./maneuver_provider.hpp"
 #include "./odometry_provider.hpp"
@@ -35,9 +36,11 @@ class NavigationProvider : public OdometryProvider, public ManeuverProvider
 {
 public:
   inline NavigationProvider();
-  inline explicit NavigationProvider(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit NavigationProvider(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline rclcpp::Node::SharedPtr get_node() const;
 
@@ -49,19 +52,19 @@ NavigationProvider::NavigationProvider()
 {
 }
 
-NavigationProvider::NavigationProvider(rclcpp::Node::SharedPtr node)
+NavigationProvider::NavigationProvider(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void NavigationProvider::set_node(rclcpp::Node::SharedPtr node)
+void NavigationProvider::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
 
   // Set parents's node
-  OdometryProvider::set_node(get_node());
-  ManeuverProvider::set_node(get_node());
+  OdometryProvider::set_node(get_node(), root_name);
+  ManeuverProvider::set_node(get_node(), root_name);
 }
 
 rclcpp::Node::SharedPtr NavigationProvider::get_node() const

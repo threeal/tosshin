@@ -24,6 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
+#include <string>
 
 #include "./utility"
 
@@ -36,9 +37,11 @@ public:
   using OnConfigureManeuver = std::function<const Maneuver & (const Maneuver &)>;
 
   inline ManeuverProvider();
-  inline explicit ManeuverProvider(rclcpp::Node::SharedPtr node);
 
-  inline void set_node(rclcpp::Node::SharedPtr node);
+  inline explicit ManeuverProvider(
+    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+
+  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
 
   inline void set_on_configure_maneuver(const OnConfigureManeuver & callback);
 
@@ -65,12 +68,12 @@ ManeuverProvider::ManeuverProvider()
 {
 }
 
-ManeuverProvider::ManeuverProvider(rclcpp::Node::SharedPtr node)
+ManeuverProvider::ManeuverProvider(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
-  set_node(node);
+  set_node(node, root_name);
 }
 
-void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
+void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
 {
   // Initialize the node
   this->node = node;
@@ -78,7 +81,7 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the maneuver event publisher
   {
     maneuver_event_publisher = get_node()->create_publisher<Maneuver>(
-      "/navigation/maneuver_event", 10);
+      root_name + "/maneuver_event", 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
@@ -89,7 +92,7 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the maneuver input subscription
   {
     maneuver_input_subscription = get_node()->create_subscription<Maneuver>(
-      "/navigation/maneuver_input", 10,
+      root_name + "/maneuver_input", 10,
       [this](const Maneuver::SharedPtr maneuver) {
         set_maneuver(*maneuver);
       });
@@ -103,7 +106,7 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
   // Initialize the configure maneuver service
   {
     configure_maneuver_service = get_node()->create_service<ConfigureManeuver>(
-      "/navigation/configure_maneuver",
+      root_name + "/configure_maneuver",
       [this](ConfigureManeuver::Request::SharedPtr request,
       ConfigureManeuver::Response::SharedPtr response) {
         bool configured = false;
