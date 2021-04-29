@@ -18,17 +18,55 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__TOSSHIN_CPP_HPP_
-#define TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+#ifndef TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_
+#define TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_
 
-#include "./consumer/maneuver_consumer.hpp"
-#include "./consumer/navigation_consumer.hpp"
-#include "./consumer/odometry_consumer.hpp"
+#include <rclcpp/rclcpp.hpp>
 
-#include "./provider/maneuver_provider.hpp"
-#include "./provider/navigation_provider.hpp"
-#include "./provider/odometry_provider.hpp"
+#include "./maneuver_consumer.hpp"
+#include "./odometry_consumer.hpp"
 
-#include "./utility.hpp"
+namespace tosshin_cpp
+{
 
-#endif  // TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+class NavigationConsumer : public OdometryConsumer, public ManeuverConsumer
+{
+public:
+  inline NavigationConsumer();
+  inline explicit NavigationConsumer(rclcpp::Node::SharedPtr node);
+
+  inline void set_node(rclcpp::Node::SharedPtr node);
+
+  inline rclcpp::Node::SharedPtr get_node() const;
+
+private:
+  rclcpp::Node::SharedPtr node;
+};
+
+NavigationConsumer::NavigationConsumer()
+{
+}
+
+NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node)
+{
+  set_node(node);
+}
+
+void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
+{
+  // Initialize the node
+  this->node = node;
+
+  // Set parents's node
+  OdometryConsumer::set_node(get_node());
+  ManeuverConsumer::set_node(get_node());
+}
+
+rclcpp::Node::SharedPtr NavigationConsumer::get_node() const
+{
+  return node;
+}
+
+}  // namespace tosshin_cpp
+
+#endif  // TOSSHIN_CPP__CONSUMER__NAVIGATION_CONSUMER_HPP_

@@ -18,17 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__TOSSHIN_CPP_HPP_
-#define TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+#include <gtest/gtest.h>
+#include <tosshin_cpp/tosshin_cpp.hpp>
 
-#include "./consumer/maneuver_consumer.hpp"
-#include "./consumer/navigation_consumer.hpp"
-#include "./consumer/odometry_consumer.hpp"
-
-#include "./provider/maneuver_provider.hpp"
-#include "./provider/navigation_provider.hpp"
-#include "./provider/odometry_provider.hpp"
-
-#include "./utility.hpp"
-
-#endif  // TOSSHIN_CPP__TOSSHIN_CPP_HPP_
+TEST(CompileTest, All) {
+  tosshin_cpp::ManeuverConsumer();
+  tosshin_cpp::ManeuverProvider();
+  tosshin_cpp::NavigationConsumer();
+  tosshin_cpp::NavigationProvider();
+  tosshin_cpp::OdometryConsumer();
+  tosshin_cpp::OdometryProvider();
+}

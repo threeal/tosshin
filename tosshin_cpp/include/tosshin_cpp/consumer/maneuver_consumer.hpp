@@ -18,93 +18,74 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
-#define TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
+#ifndef TOSSHIN_CPP__CONSUMER__MANEUVER_CONSUMER_HPP_
+#define TOSSHIN_CPP__CONSUMER__MANEUVER_CONSUMER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
+
+#include "../utility.hpp"
 
 namespace tosshin_cpp
 {
 
-using Maneuver = tosshin_interfaces::msg::Maneuver;
-using Odometry = tosshin_interfaces::msg::Odometry;
-using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
-
-class NavigationConsumer
+class ManeuverConsumer
 {
 public:
-  inline NavigationConsumer();
-  inline explicit NavigationConsumer(rclcpp::Node::SharedPtr node);
+  using OnChangeManeuver = std::function<void (const Maneuver &)>;
+
+  inline ManeuverConsumer();
+  inline explicit ManeuverConsumer(rclcpp::Node::SharedPtr node);
 
   inline void set_node(rclcpp::Node::SharedPtr node);
+
+  inline void set_on_change_maneuver(const OnChangeManeuver & callback);
 
   inline const Maneuver & configure_maneuver(const Maneuver & maneuver);
   inline const Maneuver & configure_maneuver_to_stop();
 
   inline void set_maneuver(const Maneuver & maneuver);
 
-  inline rclcpp::Node::SharedPtr get_node();
+  inline rclcpp::Node::SharedPtr get_node() const;
 
-  inline const Odometry & get_odometry();
-  inline const Maneuver & get_maneuver();
+  inline const Maneuver & get_maneuver() const;
 
 private:
-  rclcpp::Node::SharedPtr node;
+  inline void change_maneuver(const Maneuver & maneuver);
 
-  rclcpp::Subscription<Odometry>::SharedPtr odometry_subscription;
+  rclcpp::Node::SharedPtr node;
 
   rclcpp::Subscription<Maneuver>::SharedPtr maneuver_event_subscription;
   rclcpp::Publisher<Maneuver>::SharedPtr maneuver_input_publisher;
 
   rclcpp::Client<ConfigureManeuver>::SharedPtr configure_maneuver_client;
 
-  Odometry current_odometry;
+  OnChangeManeuver on_change_maneuver;
+
   Maneuver current_maneuver;
 };
 
-NavigationConsumer::NavigationConsumer()
+ManeuverConsumer::ManeuverConsumer()
 {
 }
 
-NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node)
+ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node)
 {
   set_node(node);
 }
 
-void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
+void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node)
 {
   // Initialize the node
-  {
-    this->node = node;
-
-    RCLCPP_INFO_STREAM(
-      get_node()->get_logger(),
-      "Node initialized on " << get_node()->get_name() << "!");
-  }
-
-  // Initialize the odometry subscription
-  {
-    odometry_subscription = get_node()->create_subscription<Odometry>(
-      "navigation/odometry", 10,
-      [this](const Odometry::SharedPtr msg) {
-        current_odometry = *msg;
-      });
-
-    RCLCPP_INFO_STREAM(
-      get_node()->get_logger(),
-      "Odometry subscription initialized on " <<
-        odometry_subscription->get_topic_name() << "!");
-  }
+  this->node = node;
 
   // Initialize the maneuver event subscription
   {
     maneuver_event_subscription = get_node()->create_subscription<Maneuver>(
       "/navigation/maneuver_event", 10,
       [this](const Maneuver::SharedPtr msg) {
-        current_maneuver = *msg;
+        change_maneuver(*msg);
       });
 
     RCLCPP_INFO_STREAM(
@@ -143,7 +124,7 @@ void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
           request, [this](rclcpp::Client<ConfigureManeuver>::SharedFuture future) {
             auto response = future.get();
             if (response->maneuver.size() > 0) {
-              current_maneuver = response->maneuver.front();
+              change_maneuver(response->maneuver.front());
             }
           });
       } else {
@@ -152,7 +133,12 @@ void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node)
   }
 }
 
-const Maneuver & NavigationConsumer::configure_maneuver(const Maneuver & maneuver)
+void ManeuverConsumer::set_on_change_maneuver(const OnChangeManeuver & callback)
+{
+  on_change_maneuver = callback;
+}
+
+const Maneuver & ManeuverConsumer::configure_maneuver(const Maneuver & maneuver)
 {
   if (!configure_maneuver_client->wait_for_service(std::chrono::seconds(1))) {
     throw std::runtime_error("configure maneuver service is not ready");
@@ -171,12 +157,12 @@ const Maneuver & NavigationConsumer::configure_maneuver(const Maneuver & maneuve
     throw std::runtime_error("maneuver not configured");
   }
 
-  current_maneuver = response->maneuver.front();
+  change_maneuver(response->maneuver.front());
 
-  return current_maneuver;
+  return get_maneuver();
 }
 
-const Maneuver & NavigationConsumer::configure_maneuver_to_stop()
+const Maneuver & ManeuverConsumer::configure_maneuver_to_stop()
 {
   Maneuver maneuver;
 
@@ -187,26 +173,30 @@ const Maneuver & NavigationConsumer::configure_maneuver_to_stop()
   return configure_maneuver(maneuver);
 }
 
-void NavigationConsumer::set_maneuver(const Maneuver & maneuver)
+void ManeuverConsumer::set_maneuver(const Maneuver & maneuver)
 {
   maneuver_input_publisher->publish(maneuver);
 }
 
-rclcpp::Node::SharedPtr NavigationConsumer::get_node()
+rclcpp::Node::SharedPtr ManeuverConsumer::get_node() const
 {
   return node;
 }
 
-const Odometry & NavigationConsumer::get_odometry()
-{
-  return current_odometry;
-}
-
-const Maneuver & NavigationConsumer::get_maneuver()
+const Maneuver & ManeuverConsumer::get_maneuver() const
 {
   return current_maneuver;
 }
 
+void ManeuverConsumer::change_maneuver(const Maneuver & maneuver)
+{
+  if (on_change_maneuver) {
+    on_change_maneuver(maneuver);
+  }
+
+  current_maneuver = maneuver;
+}
+
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__NAVIGATION__NAVIGATION_CONSUMER_HPP_
+#endif  // TOSSHIN_CPP__CONSUMER__MANEUVER_CONSUMER_HPP_

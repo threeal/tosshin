@@ -18,81 +18,62 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_
-#define TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_
+#ifndef TOSSHIN_CPP__PROVIDER__MANEUVER_PROVIDER_HPP_
+#define TOSSHIN_CPP__PROVIDER__MANEUVER_PROVIDER_HPP_
 
 #include <rclcpp/rclcpp.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
 
 #include <memory>
+
+#include "./utility"
 
 namespace tosshin_cpp
 {
 
-using Maneuver = tosshin_interfaces::msg::Maneuver;
-using Odometry = tosshin_interfaces::msg::Odometry;
-using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
-
-class NavigationProvider
+class ManeuverProvider
 {
 public:
-  inline NavigationProvider();
-  inline explicit NavigationProvider(rclcpp::Node::SharedPtr node);
+  using OnConfigureManeuver = std::function<const Maneuver & (const Maneuver &)>;
+
+  inline ManeuverProvider();
+  inline explicit ManeuverProvider(rclcpp::Node::SharedPtr node);
 
   inline void set_node(rclcpp::Node::SharedPtr node);
 
-  inline void set_odometry(const Odometry & odometry);
+  inline void set_on_configure_maneuver(const OnConfigureManeuver & callback);
+
   inline void set_maneuver(const Maneuver & maneuver);
 
-  inline rclcpp::Node::SharedPtr get_node();
+  inline rclcpp::Node::SharedPtr get_node() const;
 
-  inline const Maneuver & get_maneuver();
-
-protected:
-  inline virtual const Maneuver & on_configure_maneuver(const Maneuver & maneuver);
+  inline const Maneuver & get_maneuver() const;
 
 private:
   rclcpp::Node::SharedPtr node;
-
-  rclcpp::Publisher<Odometry>::SharedPtr odometry_publisher;
 
   rclcpp::Publisher<Maneuver>::SharedPtr maneuver_event_publisher;
   rclcpp::Subscription<Maneuver>::SharedPtr maneuver_input_subscription;
 
   rclcpp::Service<ConfigureManeuver>::SharedPtr configure_maneuver_service;
 
+  OnConfigureManeuver on_configure_maneuver;
+
   Maneuver current_maneuver;
 };
 
-NavigationProvider::NavigationProvider()
+ManeuverProvider::ManeuverProvider()
 {
 }
 
-NavigationProvider::NavigationProvider(rclcpp::Node::SharedPtr node)
+ManeuverProvider::ManeuverProvider(rclcpp::Node::SharedPtr node)
 {
   set_node(node);
 }
 
-void NavigationProvider::set_node(rclcpp::Node::SharedPtr node)
+void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node)
 {
   // Initialize the node
-  {
-    this->node = node;
-
-    RCLCPP_INFO_STREAM(
-      get_node()->get_logger(),
-      "Node initialized on " << get_node()->get_name() << "!");
-  }
-
-  // Initialize the odometry publisher
-  {
-    odometry_publisher = get_node()->create_publisher<Odometry>("navigation/odometry", 10);
-
-    RCLCPP_INFO_STREAM(
-      get_node()->get_logger(),
-      "Odometry publisher initialized on " <<
-        odometry_publisher->get_topic_name() << "!");
-  }
+  this->node = node;
 
   // Initialize the maneuver event publisher
   {
@@ -145,32 +126,33 @@ void NavigationProvider::set_node(rclcpp::Node::SharedPtr node)
   }
 }
 
-void NavigationProvider::set_odometry(const Odometry & odometry)
+void ManeuverProvider::set_on_configure_maneuver(
+  const ManeuverProvider::OnConfigureManeuver & callback)
 {
-  odometry_publisher->publish(odometry);
+  on_configure_maneuver = callback;
 }
 
-void NavigationProvider::set_maneuver(const Maneuver & maneuver)
+void ManeuverProvider::set_maneuver(const Maneuver & maneuver)
 {
-  current_maneuver = on_configure_maneuver(maneuver);
+  if (on_configure_maneuver) {
+    current_maneuver = on_configure_maneuver(maneuver);
+  } else {
+    current_maneuver = maneuver;
+  }
+
   maneuver_event_publisher->publish(current_maneuver);
 }
 
-rclcpp::Node::SharedPtr NavigationProvider::get_node()
+rclcpp::Node::SharedPtr ManeuverProvider::get_node() const
 {
   return node;
 }
 
-const Maneuver & NavigationProvider::get_maneuver()
+const Maneuver & ManeuverProvider::get_maneuver() const
 {
   return current_maneuver;
 }
 
-const Maneuver & NavigationProvider::on_configure_maneuver(const Maneuver & maneuver)
-{
-  return maneuver;
-}
-
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__NAVIGATION__NAVIGATION_PROVIDER_HPP_
+#endif  // TOSSHIN_CPP__PROVIDER__MANEUVER_PROVIDER_HPP_
