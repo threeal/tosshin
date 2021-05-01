@@ -26,7 +26,7 @@
 #include <memory>
 #include <string>
 
-#include "./utility"
+#include "../interfaces.hpp"
 
 namespace tosshin_cpp
 {

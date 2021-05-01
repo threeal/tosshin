@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN_CPP__UTILITY_HPP_
-#define TOSSHIN_CPP__UTILITY_HPP_
+#ifndef TOSSHIN_CPP__INTERFACES_HPP_
+#define TOSSHIN_CPP__INTERFACES_HPP_
 
 #include <tosshin_interfaces/msg/maneuver.hpp>
 #include <tosshin_interfaces/msg/odometry.hpp>
@@ -40,4 +40,4 @@ using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
 
 }  // namespace tosshin_cpp
 
-#endif  // TOSSHIN_CPP__UTILITY_HPP_
+#endif  // TOSSHIN_CPP__INTERFACES_HPP_
