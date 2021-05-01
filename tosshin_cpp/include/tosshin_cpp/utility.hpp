@@ -22,7 +22,12 @@
 #define TOSSHIN_CPP__UTILITY_HPP_
 
 #include <keisan/keisan.hpp>
-#include <tosshin_interfaces/tosshin_interfaces.hpp>
+#include <tosshin_interfaces/msg/maneuver.hpp>
+#include <tosshin_interfaces/msg/odometry.hpp>
+#include <tosshin_interfaces/msg/orientation.hpp>
+#include <tosshin_interfaces/msg/position.hpp>
+#include <tosshin_interfaces/srv/configure_odometry.hpp>
+#include <tosshin_interfaces/srv/configure_maneuver.hpp>
 
 namespace tosshin_cpp
 {
