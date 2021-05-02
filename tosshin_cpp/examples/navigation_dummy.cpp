@@ -38,12 +38,11 @@ int main(int argc, char ** argv)
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-h" || arg == "--help") {
-      std::cout << "Usage: ros2 run tosshin_cpp navigation_provider_dummy " <<
-        "[options] [navigation_prefix]" <<
+      std::cout << "Usage: ros2 run tosshin_cpp navigation_dummy [options] [navigation_prefix]" <<
         "\n\nPositional arguments:" <<
         "\nnavigation_prefix\tprefix name for navigation's topics and services" <<
         "\n\nOptional arguments:" <<
-        "\n-h, --help\tshow this help message and exit";
+        "\n-h, --help\t\tshow this help message and exit" << std::endl;
 
       return 1;
     } else if (navigation_prefix == nullptr) {

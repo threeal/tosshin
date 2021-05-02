@@ -21,10 +21,10 @@ find_package(tosshin_interfaces REQUIRED)
 
 install(DIRECTORY "include" DESTINATION ".")
 
-add_executable(navigation_provider_dummy "examples/navigation_provider_dummy.cpp")
-add_executable(navigation_consumer_teleop "examples/navigation_consumer_teleop.cpp")
+add_executable(navigation_dummy "examples/navigation_dummy.cpp")
+add_executable(navigation_teleop "examples/navigation_teleop.cpp")
 
-foreach(target navigation_provider_dummy navigation_consumer_teleop)
+foreach(target navigation_dummy navigation_teleop)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
@@ -37,19 +37,7 @@ foreach(target navigation_provider_dummy navigation_consumer_teleop)
 endforeach()
 
 if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)
-
-  ament_add_gtest(${PROJECT_NAME}_tests
-    "test/compile_test.cpp")
-
-  target_include_directories(${PROJECT_NAME}_tests PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
-
-  ament_target_dependencies(${PROJECT_NAME}_tests
-    keisan rclcpp tosshin_interfaces)
-
   ament_lint_auto_find_test_dependencies()
 endif()
 
