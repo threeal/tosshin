@@ -23,10 +23,11 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <future>
 #include <memory>
 #include <string>
 
-#include "../utility.hpp"
+#include "../interface.hpp"
 
 namespace tosshin_cpp
 {
@@ -34,19 +35,23 @@ namespace tosshin_cpp
 class ManeuverConsumer
 {
 public:
-  using OnChangeManeuver = std::function<void (const Maneuver &)>;
+  using ManeuverCallback = std::function<void (const Maneuver &)>;
 
   inline ManeuverConsumer();
 
   inline explicit ManeuverConsumer(
-    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
-  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+  inline void set_node(
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
-  inline void set_on_change_maneuver(const OnChangeManeuver & callback);
+  inline void set_on_change_maneuver(const ManeuverCallback & callback);
 
-  inline const Maneuver & configure_maneuver(const Maneuver & maneuver);
-  inline const Maneuver & configure_maneuver_to_stop();
+  inline void request_to_configure_maneuver(
+    ConfigureManeuver::Request::SharedPtr request, const ManeuverCallback & callback = {});
+
+  inline void configure_maneuver(const Maneuver & maneuver, const ManeuverCallback & callback = {});
+  inline void fetch_maneuver(const ManeuverCallback & callback = {});
 
   inline void set_maneuver(const Maneuver & maneuver);
 
@@ -64,7 +69,7 @@ private:
 
   rclcpp::Client<ConfigureManeuver>::SharedPtr configure_maneuver_client;
 
-  OnChangeManeuver on_change_maneuver;
+  ManeuverCallback on_change_maneuver;
 
   Maneuver current_maneuver;
 };
@@ -73,12 +78,12 @@ ManeuverConsumer::ManeuverConsumer()
 {
 }
 
-ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
+ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
-  set_node(node, root_name);
+  set_node(node, prefix);
 }
 
-void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
+void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
   // Initialize the node
   this->node = node;
@@ -86,94 +91,83 @@ void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string 
   // Initialize the maneuver event subscription
   {
     maneuver_event_subscription = get_node()->create_subscription<Maneuver>(
-      root_name + "/maneuver_event", 10,
+      prefix + MANEUVER_EVENT_SUFFIX, 10,
       [this](const Maneuver::SharedPtr msg) {
         change_maneuver(*msg);
       });
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Maneuver event subscription initialized on " <<
-        maneuver_event_subscription->get_topic_name() << "!");
+      "Maneuver event subscription initialized on `" <<
+        maneuver_event_subscription->get_topic_name() << "`!");
   }
 
   // Initialize the maneuver input publisher
   {
     maneuver_input_publisher = get_node()->create_publisher<Maneuver>(
-      root_name + "/maneuver_input", 10);
+      prefix + MANEUVER_INPUT_SUFFIX, 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Maneuver input publisher initialized on " <<
-        maneuver_input_publisher->get_topic_name() << "!");
+      "Maneuver input publisher initialized on `" <<
+        maneuver_input_publisher->get_topic_name() << "`!");
   }
 
   // Initialize the configure maneuver client
   {
     configure_maneuver_client = get_node()->create_client<ConfigureManeuver>(
-      root_name + "/configure_maneuver");
+      prefix + CONFIGURE_MANEUVER_SUFFIX);
+
+    RCLCPP_INFO(get_node()->get_logger(), "Waiting for configure maneuver server...");
+    if (!configure_maneuver_client->wait_for_service(std::chrono::seconds(3))) {
+      RCLCPP_ERROR(get_node()->get_logger(), "Configure maneuver server is not ready!");
+      throw std::runtime_error("configure maneuver server is not ready");
+    }
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Configure maneuver client initialized on " <<
-        configure_maneuver_client->get_service_name() << "!");
-
-    // Request maneuver data
-    {
-      if (configure_maneuver_client->wait_for_service(std::chrono::seconds(1))) {
-        auto request = std::make_shared<ConfigureManeuver::Request>();
-
-        configure_maneuver_client->async_send_request(
-          request, [this](rclcpp::Client<ConfigureManeuver>::SharedFuture future) {
-            auto response = future.get();
-            if (response->maneuver.size() > 0) {
-              change_maneuver(response->maneuver.front());
-            }
-          });
-      } else {
-      }
-    }
+      "Configure maneuver client initialized on `" <<
+        configure_maneuver_client->get_service_name() << "`!");
   }
+
+  // Initial data fetch
+  fetch_maneuver();
 }
 
-void ManeuverConsumer::set_on_change_maneuver(const OnChangeManeuver & callback)
+void ManeuverConsumer::set_on_change_maneuver(const ManeuverCallback & callback)
 {
   on_change_maneuver = callback;
 }
 
-const Maneuver & ManeuverConsumer::configure_maneuver(const Maneuver & maneuver)
+void ManeuverConsumer::request_to_configure_maneuver(
+  ConfigureManeuver::Request::SharedPtr request, const ManeuverCallback & callback)
 {
-  if (!configure_maneuver_client->wait_for_service(std::chrono::seconds(1))) {
-    throw std::runtime_error("configure maneuver service is not ready");
-  }
+  configure_maneuver_client->async_send_request(
+    request, [this, callback](rclcpp::Client<ConfigureManeuver>::SharedFuture future) {
+      auto response = future.get();
+      if (response->maneuver.size() > 0) {
+        change_maneuver(response->maneuver.front());
+        if (callback) {
+          callback(response->maneuver.front());
+        }
+      } else {
+        RCLCPP_WARN(get_node()->get_logger(), "Configure maneuver service response is empty!");
+      }
+    });
+}
 
+void ManeuverConsumer::configure_maneuver(
+  const Maneuver & maneuver, const ManeuverCallback & callback)
+{
   auto request = std::make_shared<ConfigureManeuver::Request>();
   request->maneuver.push_back(maneuver);
 
-  auto future = configure_maneuver_client->async_send_request(request);
-  if (rclcpp::spin_until_future_complete(get_node(), future) != rclcpp::FutureReturnCode::SUCCESS) {
-    throw std::runtime_error("failed to call configure maneuver service");
-  }
-
-  auto response = future.get();
-  if (response->maneuver.size() < 1) {
-    throw std::runtime_error("maneuver not configured");
-  }
-
-  change_maneuver(response->maneuver.front());
-
-  return get_maneuver();
+  request_to_configure_maneuver(request, callback);
 }
 
-const Maneuver & ManeuverConsumer::configure_maneuver_to_stop()
+void ManeuverConsumer::fetch_maneuver(const ManeuverCallback & callback)
 {
-  Maneuver maneuver;
-
-  maneuver.forward = 0.0;
-  maneuver.left = 0.0;
-  maneuver.yaw = 0.0;
-
-  return configure_maneuver(maneuver);
+  request_to_configure_maneuver(std::make_shared<ConfigureManeuver::Request>(), callback);
 }
 
 void ManeuverConsumer::set_maneuver(const Maneuver & maneuver)

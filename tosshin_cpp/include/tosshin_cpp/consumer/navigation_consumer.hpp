@@ -37,9 +37,10 @@ public:
   inline NavigationConsumer();
 
   inline explicit NavigationConsumer(
-    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
-  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+  inline void set_node(
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
   inline rclcpp::Node::SharedPtr get_node() const;
 
@@ -51,19 +52,19 @@ NavigationConsumer::NavigationConsumer()
 {
 }
 
-NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
+NavigationConsumer::NavigationConsumer(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
-  set_node(node, root_name);
+  set_node(node, prefix);
 }
 
-void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
+void NavigationConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
   // Initialize the node
   this->node = node;
 
   // Set parents's node
-  OdometryConsumer::set_node(get_node(), root_name);
-  ManeuverConsumer::set_node(get_node(), root_name);
+  OdometryConsumer::set_node(get_node(), prefix);
+  ManeuverConsumer::set_node(get_node(), prefix);
 }
 
 rclcpp::Node::SharedPtr NavigationConsumer::get_node() const

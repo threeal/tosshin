@@ -26,7 +26,7 @@
 #include <memory>
 #include <string>
 
-#include "./utility"
+#include "../interface.hpp"
 
 namespace tosshin_cpp
 {
@@ -37,53 +37,66 @@ public:
   inline OdometryProvider();
 
   inline explicit OdometryProvider(
-    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
-  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+  inline void set_node(
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
   inline void set_odometry(const Odometry & odometry);
 
   inline rclcpp::Node::SharedPtr get_node() const;
 
+  inline const Odometry & get_odometry() const;
+
 private:
   rclcpp::Node::SharedPtr node;
 
   rclcpp::Publisher<Odometry>::SharedPtr odometry_publisher;
+
+  Odometry current_odometry;
 };
 
 OdometryProvider::OdometryProvider()
 {
 }
 
-OdometryProvider::OdometryProvider(rclcpp::Node::SharedPtr node, const std::string & root_name)
+OdometryProvider::OdometryProvider(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
-  set_node(node, root_name);
+  set_node(node, prefix);
 }
 
-void OdometryProvider::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
+void OdometryProvider::set_node(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
   // Initialize the node
   this->node = node;
 
   // Initialize the odometry publisher
   {
-    odometry_publisher = get_node()->create_publisher<Odometry>(root_name + "/odometry", 10);
+    odometry_publisher = get_node()->create_publisher<Odometry>(prefix + ODOMETRY_SUFFIX, 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Odometry publisher initialized on " <<
-        odometry_publisher->get_topic_name() << "!");
+      "Odometry publisher initialized on `" << odometry_publisher->get_topic_name() << "`!");
   }
+
+  // Initial data publish
+  set_odometry(get_odometry());
 }
 
 void OdometryProvider::set_odometry(const Odometry & odometry)
 {
-  odometry_publisher->publish(odometry);
+  current_odometry = odometry;
+  odometry_publisher->publish(current_odometry);
 }
 
 rclcpp::Node::SharedPtr OdometryProvider::get_node() const
 {
   return node;
+}
+
+const Odometry & OdometryProvider::get_odometry() const
+{
+  return current_odometry;
 }
 
 }  // namespace tosshin_cpp
