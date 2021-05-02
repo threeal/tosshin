@@ -39,9 +39,10 @@ public:
   inline ManeuverConsumer();
 
   inline explicit ManeuverConsumer(
-    rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
-  inline void set_node(rclcpp::Node::SharedPtr node, const std::string & root_name = "/navigation");
+  inline void set_node(
+    rclcpp::Node::SharedPtr node, const std::string & prefix = NAVIGATION_PREFIX);
 
   inline void set_on_change_maneuver(const OnChangeManeuver & callback);
 
@@ -73,12 +74,12 @@ ManeuverConsumer::ManeuverConsumer()
 {
 }
 
-ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node, const std::string & root_name)
+ManeuverConsumer::ManeuverConsumer(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
-  set_node(node, root_name);
+  set_node(node, prefix);
 }
 
-void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & root_name)
+void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string & prefix)
 {
   // Initialize the node
   this->node = node;
@@ -86,37 +87,37 @@ void ManeuverConsumer::set_node(rclcpp::Node::SharedPtr node, const std::string 
   // Initialize the maneuver event subscription
   {
     maneuver_event_subscription = get_node()->create_subscription<Maneuver>(
-      root_name + "/maneuver_event", 10,
+      prefix + MANEUVER_EVENT_SUFFIX, 10,
       [this](const Maneuver::SharedPtr msg) {
         change_maneuver(*msg);
       });
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Maneuver event subscription initialized on " <<
-        maneuver_event_subscription->get_topic_name() << "!");
+      "Maneuver event subscription initialized on `" <<
+        maneuver_event_subscription->get_topic_name() << "`!");
   }
 
   // Initialize the maneuver input publisher
   {
     maneuver_input_publisher = get_node()->create_publisher<Maneuver>(
-      root_name + "/maneuver_input", 10);
+      prefix + MANEUVER_INPUT_SUFFIX, 10);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Maneuver input publisher initialized on " <<
-        maneuver_input_publisher->get_topic_name() << "!");
+      "Maneuver input publisher initialized on `" <<
+        maneuver_input_publisher->get_topic_name() << "`!");
   }
 
   // Initialize the configure maneuver client
   {
     configure_maneuver_client = get_node()->create_client<ConfigureManeuver>(
-      root_name + "/configure_maneuver");
+      prefix + CONFIGURE_MANEUVER_SUFFIX);
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Configure maneuver client initialized on " <<
-        configure_maneuver_client->get_service_name() << "!");
+      "Configure maneuver client initialized on `" <<
+        configure_maneuver_client->get_service_name() << "`!");
 
     // Request maneuver data
     {

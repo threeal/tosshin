@@ -38,6 +38,14 @@ using Position = tosshin_interfaces::msg::Position;
 using ConfigureOdometry = tosshin_interfaces::srv::ConfigureOdometry;
 using ConfigureManeuver = tosshin_interfaces::srv::ConfigureManeuver;
 
+const char * NAVIGATION_PREFIX = "/navigation";
+
+const char * ODOMETRY_SUFFIX = "/odometry";
+
+const char * MANEUVER_INPUT_SUFFIX = "/maneuver_input";
+const char * MANEUVER_EVENT_SUFFIX = "/maneuver_event";
+
+const char * CONFIGURE_MANEUVER_SUFFIX = "/configure_maneuver";
 }  // namespace tosshin_cpp
 
 #endif  // TOSSHIN_CPP__INTERFACES_HPP_
