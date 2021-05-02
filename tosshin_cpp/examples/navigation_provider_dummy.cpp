@@ -41,7 +41,7 @@ int main(int argc, char ** argv)
       std::cout << "Usage: ros2 run tosshin_cpp navigation_provider_dummy " <<
         "[options] [navigation_prefix]" <<
         "\n\nPositional arguments:" <<
-        "\nnavigation_prefix\tspecify the navigation prefix" <<
+        "\nnavigation_prefix\tprefix name for navigation's topics and services" <<
         "\n\nOptional arguments:" <<
         "\n-h, --help\tshow this help message and exit";
 
@@ -72,13 +72,14 @@ int main(int argc, char ** argv)
         auto maneuver = navigation_provider->get_maneuver();
 
         // Odometry orientation is in degree while maneuver yaw is in radian per minute
-        odometry.orientation.yaw += keisan::rad_to_deg(maneuver.yaw) / 600;
+        odometry.orientation.yaw = keisan::wrap_deg(
+          odometry.orientation.yaw + keisan::rad_to_deg(maneuver.yaw / 600));
 
-        auto angle = odometry.orientation.yaw;
+        auto angle = keisan::deg_to_rad(odometry.orientation.yaw);
 
         // Odometry position is in meter while maneuver forward and left are in meter per minute
-        odometry.position.x = maneuver.forward * cos(angle) - maneuver.left * sin(angle) / 600;
-        odometry.position.y = maneuver.forward * sin(angle) + maneuver.left * cos(angle) / 600;
+        odometry.position.x += (maneuver.forward * cos(angle) - maneuver.left * sin(angle)) / 600;
+        odometry.position.y += (maneuver.forward * sin(angle) + maneuver.left * cos(angle)) / 600;
 
         navigation_provider->set_odometry(odometry);
       }

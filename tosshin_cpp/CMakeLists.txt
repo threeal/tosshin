@@ -22,8 +22,9 @@ find_package(tosshin_interfaces REQUIRED)
 install(DIRECTORY "include" DESTINATION ".")
 
 add_executable(navigation_provider_dummy "examples/navigation_provider_dummy.cpp")
+add_executable(navigation_consumer_teleop "examples/navigation_consumer_teleop.cpp")
 
-foreach(target navigation_provider_dummy)
+foreach(target navigation_provider_dummy navigation_consumer_teleop)
   target_include_directories(${target} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
