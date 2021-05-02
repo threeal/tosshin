@@ -122,6 +122,9 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node, const std::string 
       "Configure maneuver service initialized on `" <<
         configure_maneuver_service->get_service_name() << "`!");
   }
+
+  // Initial data publish
+  set_maneuver(get_maneuver());
 }
 
 void ManeuverProvider::set_on_configure_maneuver(

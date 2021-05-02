@@ -78,6 +78,9 @@ void OdometryProvider::set_node(rclcpp::Node::SharedPtr node, const std::string 
       get_node()->get_logger(),
       "Odometry publisher initialized on `" << odometry_publisher->get_topic_name() << "`!");
   }
+
+  // Initial data publish
+  set_odometry(get_odometry());
 }
 
 void OdometryProvider::set_odometry(const Odometry & odometry)
