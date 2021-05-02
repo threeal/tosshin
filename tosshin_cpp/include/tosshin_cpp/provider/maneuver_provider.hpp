@@ -109,17 +109,11 @@ void ManeuverProvider::set_node(rclcpp::Node::SharedPtr node, const std::string 
       root_name + "/configure_maneuver",
       [this](ConfigureManeuver::Request::SharedPtr request,
       ConfigureManeuver::Response::SharedPtr response) {
-        bool configured = false;
-
         if (request->maneuver.size() > 0) {
           set_maneuver(request->maneuver.front());
-          response->maneuver.push_back(get_maneuver());
-          configured = true;
         }
 
-        if (!configured) {
-          response->maneuver.push_back(get_maneuver());
-        }
+        response->maneuver.push_back(get_maneuver());
       });
 
     RCLCPP_INFO_STREAM(

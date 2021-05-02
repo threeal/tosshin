@@ -45,10 +45,14 @@ public:
 
   inline rclcpp::Node::SharedPtr get_node() const;
 
+  inline const Odometry & get_odometry() const;
+
 private:
   rclcpp::Node::SharedPtr node;
 
   rclcpp::Publisher<Odometry>::SharedPtr odometry_publisher;
+
+  Odometry current_odometry;
 };
 
 OdometryProvider::OdometryProvider()
@@ -71,19 +75,24 @@ void OdometryProvider::set_node(rclcpp::Node::SharedPtr node, const std::string 
 
     RCLCPP_INFO_STREAM(
       get_node()->get_logger(),
-      "Odometry publisher initialized on " <<
-        odometry_publisher->get_topic_name() << "!");
+      "Odometry publisher initialized on " << odometry_publisher->get_topic_name() << "!");
   }
 }
 
 void OdometryProvider::set_odometry(const Odometry & odometry)
 {
-  odometry_publisher->publish(odometry);
+  current_odometry = odometry;
+  odometry_publisher->publish(current_odometry);
 }
 
 rclcpp::Node::SharedPtr OdometryProvider::get_node() const
 {
   return node;
+}
+
+const Odometry & OdometryProvider::get_odometry() const
+{
+  return current_odometry;
 }
 
 }  // namespace tosshin_cpp
