@@ -15,7 +15,8 @@ jobs:
           path: tosshin
       - name: Add Debian repository and rosdep sources list
         run: |
-          sudo apt update && sudo apt install curl
+          sudo apt update && sudo apt install curl python3-rosdep
+          sudo rosdep init || true
           curl -s http://repository.ichiro-its.org/debian/setup-nightly.bash | bash -s
           curl -s http://repository.ichiro-its.org/rosdep/setup.bash | bash -s
       - name: Build and test workspace
