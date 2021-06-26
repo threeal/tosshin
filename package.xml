@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>tosshin_cpp</name>
+  <name>tosshin</name>
   <version>0.3.0</version>
-  <description>C++ implementation of Tosshin mobile robot navigation project</description>
+  <description>Robot navigation utilities</description>
   <maintainer email="alfi.maulana.f@gmail.com">Alfi Maulana</maintainer>
   <license>MIT License</license>
+  <url>https://github.com/ichiro-its/keisan</url>
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
   <depend>keisan</depend>
+  <depend>libargparse-dev</depend>
+  <depend>nav_msgs</depend>
   <depend>rclcpp</depend>
-  <depend>tosshin_interfaces</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <export>
