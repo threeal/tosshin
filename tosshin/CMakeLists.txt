@@ -16,9 +16,20 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
+set(DEPENDENCIES geometry_msgs nav_msgs)
+
+foreach(DEPENDENCY ${DEPENDENCIES})
+  find_package(${DEPENDENCY} REQUIRED)
+endforeach()
+
+install(DIRECTORY "include" DESTINATION ".")
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_dependencies(${DEPENDENCIES})
+ament_export_include_directories("include")
 
 ament_package()
