@@ -18,10 +18,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef TOSSHIN__TOSSHIN_HPP_
-#define TOSSHIN__TOSSHIN_HPP_
+#ifndef TOSSHIN__CONVERSION_HPP_
+#define TOSSHIN__CONVERSION_HPP_
 
-#include "./conversion.hpp"
+#include <keisan/keisan.hpp>
+
 #include "./interfaces.hpp"
 
-#endif  // TOSSHIN__TOSSHIN_HPP_
+namespace tosshin
+{
+
+msg::Point make_point(const keisan::Point3 & point);
+keisan::Point3 extract_point(const msg::Point & msg);
+
+msg::Point make_point_xy(const keisan::Point2 & point);
+keisan::Point2 extract_point_xy(const msg::Point & msg);
+
+msg::Quaternion make_quaternion(const keisan::Quaternion & quaternion);
+keisan::Quaternion extract_quaternion(const msg::Quaternion & msg);
+
+msg::Vector3 make_vector3(const keisan::Point3 & point);
+keisan::Point3 extract_vector3(const msg::Vector3 & msg);
+
+msg::Vector3 make_vector3_xy(const keisan::Point2 & point);
+keisan::Point2 extract_vector3_xy(const msg::Vector3 & msg);
+
+}  // namespace tosshin
+
+#endif  // TOSSHIN__CONVERSION_HPP_

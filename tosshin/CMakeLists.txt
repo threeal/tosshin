@@ -16,13 +16,28 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-set(DEPENDENCIES geometry_msgs nav_msgs)
+set(DEPENDENCIES geometry_msgs keisan nav_msgs)
 
 foreach(DEPENDENCY ${DEPENDENCIES})
   find_package(${DEPENDENCY} REQUIRED)
 endforeach()
 
 install(DIRECTORY "include" DESTINATION ".")
+
+add_library(${PROJECT_NAME}
+  "src/conversion.cpp")
+
+ament_target_dependencies(${PROJECT_NAME} ${DEPENDENCIES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION "lib"
+  LIBRARY DESTINATION "lib"
+  RUNTIME DESTINATION "bin")
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
@@ -31,16 +46,13 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}_tests
     "test/interfaces_test.cpp")
 
-  target_include_directories(${PROJECT_NAME}_tests PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
-
-  ament_target_dependencies(${PROJECT_NAME}_tests ${DEPENDENCIES})
+  target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})
 
   ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_export_dependencies(${DEPENDENCIES})
 ament_export_include_directories("include")
+ament_export_libraries(${PROJECT_NAME})
 
 ament_package()
