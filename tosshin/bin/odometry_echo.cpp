@@ -37,13 +37,20 @@ int main(int argc, char ** argv)
   .help("name of the odometry topic")
   .default_value(std::string("/odom"));
 
+  program.add_argument("--raw-output")
+  .help("outpur logs in raw mode")
+  .default_value(false)
+  .implicit_value(true);
+
   std::string odometry_topic;
+  bool raw_output;
 
   // Try to parse arguments
   try {
     program.parse_args(argc, argv);
 
     odometry_topic = program.get<std::string>("--odometry-topic");
+    raw_output = program.get<bool>("--raw-output");
   } catch (const std::exception & e) {
     std::cout << e.what() << std::endl;
     std::cout << program;
@@ -54,12 +61,18 @@ int main(int argc, char ** argv)
 
   auto odometry_subscription = node->create_subscription<tsn::msg::Odometry>(
     odometry_topic, 10,
-    [node](const tsn::msg::Odometry::SharedPtr msg) {
+    [node, raw_output](const tsn::msg::Odometry::SharedPtr msg) {
       auto & position = msg->pose.pose.position;
       auto & linear = msg->twist.twist.linear;
       auto & angular = msg->twist.twist.angular;
       auto orientation = tsn::extract_quaternion(msg->pose.pose.orientation).euler();
 
+      if (!raw_output) {
+        // Clear screen
+        std::cout << "\033[2J\033[2H" << std::endl;
+      }
+
+      // Outpt odometry values
       RCLCPP_INFO_STREAM(
         node->get_logger(),
         std::fixed << std::setprecision(2) <<
@@ -71,6 +84,11 @@ int main(int argc, char ** argv)
           "\nlinear vel\t: " << linear.x << ", " << linear.y << ", " << linear.z <<
           "\nangular vel\t: " << angular.x << ", " << angular.y << ", " << angular.z);
     });
+
+  if (!raw_output) {
+    RCLCPP_INFO(node->get_logger(), "Press enter to continue");
+    std::cin.get();
+  }
 
   rclcpp::spin(node);
 
