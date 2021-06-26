@@ -20,10 +20,12 @@
 
 #include <tosshin/conversion.hpp>
 
+namespace ksn = keisan;
+
 namespace tosshin
 {
 
-msg::Point make_point(const keisan::Point3 & point)
+msg::Point make_point(const ksn::Point3 & point)
 {
   msg::Point msg;
 
@@ -34,12 +36,12 @@ msg::Point make_point(const keisan::Point3 & point)
   return msg;
 }
 
-keisan::Point3 extract_point(const msg::Point & msg)
+ksn::Point3 extract_point(const msg::Point & msg)
 {
-  return keisan::Point3(msg.x, msg.y, msg.z);
+  return ksn::Point3(msg.x, msg.y, msg.z);
 }
 
-msg::Point make_point_xy(const keisan::Point2 & point)
+msg::Point make_point_xy(const ksn::Point2 & point)
 {
   msg::Point msg;
 
@@ -50,12 +52,12 @@ msg::Point make_point_xy(const keisan::Point2 & point)
   return msg;
 }
 
-keisan::Point2 extract_point_xy(const msg::Point & msg)
+ksn::Point2 extract_point_xy(const msg::Point & msg)
 {
-  return keisan::Point2(msg.x, msg.y);
+  return ksn::Point2(msg.x, msg.y);
 }
 
-msg::Quaternion make_quaternion(const keisan::Quaternion & quaternion)
+msg::Quaternion make_quaternion(const ksn::Quaternion & quaternion)
 {
   msg::Quaternion msg;
 
@@ -67,12 +69,12 @@ msg::Quaternion make_quaternion(const keisan::Quaternion & quaternion)
   return msg;
 }
 
-keisan::Quaternion extract_quaternion(const msg::Quaternion & msg)
+ksn::Quaternion extract_quaternion(const msg::Quaternion & msg)
 {
-  return keisan::Quaternion(msg.x, msg.y, msg.z, msg.w);
+  return ksn::Quaternion(msg.x, msg.y, msg.z, msg.w);
 }
 
-msg::Vector3 make_vector3(const keisan::Point3 & point)
+msg::Vector3 make_vector3(const ksn::Point3 & point)
 {
   msg::Vector3 msg;
 
@@ -83,12 +85,12 @@ msg::Vector3 make_vector3(const keisan::Point3 & point)
   return msg;
 }
 
-keisan::Point3 extract_vector3(const msg::Vector3 & msg)
+ksn::Point3 extract_vector3(const msg::Vector3 & msg)
 {
-  return keisan::Point3(msg.x, msg.y, msg.z);
+  return ksn::Point3(msg.x, msg.y, msg.z);
 }
 
-msg::Vector3 make_vector3_xy(const keisan::Point2 & point)
+msg::Vector3 make_vector3_xy(const ksn::Point2 & point)
 {
   msg::Vector3 msg;
 
@@ -99,9 +101,9 @@ msg::Vector3 make_vector3_xy(const keisan::Point2 & point)
   return msg;
 }
 
-keisan::Point2 extract_vector3_xy(const msg::Vector3 & msg)
+ksn::Point2 extract_vector3_xy(const msg::Vector3 & msg)
 {
-  return keisan::Point2(msg.x, msg.y);
+  return ksn::Point2(msg.x, msg.y);
 }
 
 }  // namespace tosshin

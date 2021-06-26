@@ -44,6 +44,7 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
 
   ament_add_gtest(${PROJECT_NAME}_tests
+    "test/conversion_test.cpp"
     "test/interfaces_test.cpp")
 
   target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})

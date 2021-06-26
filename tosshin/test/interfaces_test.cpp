@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <tosshin/tosshin.hpp>
 
-TEST(InterfacesTest, OdometryTest)
+TEST(InterfacesTest, Odometry)
 {
   tosshin::msg::Odometry odometry;
   {
