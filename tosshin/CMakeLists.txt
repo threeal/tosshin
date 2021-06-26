@@ -16,7 +16,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-set(DEPENDENCIES geometry_msgs keisan nav_msgs)
+set(DEPENDENCIES geometry_msgs keisan nav_msgs rclcpp)
 
 foreach(DEPENDENCY ${DEPENDENCIES})
   find_package(${DEPENDENCY} REQUIRED)
@@ -30,14 +30,27 @@ add_library(${PROJECT_NAME}
 ament_target_dependencies(${PROJECT_NAME} ${DEPENDENCIES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-$<INSTALL_INTERFACE:include>)
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(TARGETS ${PROJECT_NAME}
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION "lib"
   LIBRARY DESTINATION "lib"
   RUNTIME DESTINATION "bin")
+
+set(EXECUTABLES
+  "bin/odometry_echo.cpp")
+
+foreach(EXECUTABLE ${EXECUTABLES})
+  get_filename_component(TARGET ${EXECUTABLE} NAME_WE)
+
+  add_executable(${TARGET} ${EXECUTABLE})
+  target_link_libraries(${TARGET} ${PROJECT_NAME})
+
+  install(TARGETS ${TARGET}
+    DESTINATION "lib/${PROJECT_NAME}")
+endforeach()
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
