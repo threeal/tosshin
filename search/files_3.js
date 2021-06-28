@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['tosshin_2ehpp_22',['tosshin.hpp',['../tosshin_8hpp.html',1,'']]]
+  ['tosshin_2ehpp_24',['tosshin.hpp',['../tosshin_8hpp.html',1,'']]]
 ];
