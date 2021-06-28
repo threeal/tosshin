@@ -25,10 +25,12 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_with_covariance.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/twist_with_covariance.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <tf2_msgs/msg/tf_message.hpp>
 
 namespace tosshin
 {
@@ -40,10 +42,12 @@ using geometry_msgs::msg::Point;
 using geometry_msgs::msg::Pose;
 using geometry_msgs::msg::PoseWithCovariance;
 using geometry_msgs::msg::Quaternion;
+using geometry_msgs::msg::TransformStamped;
 using geometry_msgs::msg::Twist;
 using geometry_msgs::msg::TwistWithCovariance;
 using geometry_msgs::msg::Vector3;
 using nav_msgs::msg::Odometry;
+using tf2_msgs::msg::TFMessage;
 
 }  // namespace msg
 
