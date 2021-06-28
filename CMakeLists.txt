@@ -16,7 +16,8 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
-set(DEPENDENCIES argparse geometry_msgs keisan nav_msgs rclcpp)
+set(DEPENDENCIES
+  argparse geometry_msgs keisan nav_msgs rclcpp tf2_msgs)
 
 foreach(DEPENDENCY ${DEPENDENCIES})
   find_package(${DEPENDENCY} REQUIRED)

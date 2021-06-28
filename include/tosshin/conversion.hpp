@@ -29,6 +29,7 @@ namespace tosshin
 {
 
 msg::Point make_point(const keisan::Point3 & point);
+msg::Point make_point(const msg::Vector3 & vector3);
 keisan::Point3 extract_point(const msg::Point & msg);
 
 msg::Point make_point_xy(const keisan::Point2 & point);
@@ -38,10 +39,14 @@ msg::Quaternion make_quaternion(const keisan::Quaternion & quaternion);
 keisan::Quaternion extract_quaternion(const msg::Quaternion & msg);
 
 msg::Vector3 make_vector3(const keisan::Point3 & point);
+msg::Vector3 make_vector3(const msg::Point & point);
 keisan::Point3 extract_vector3(const msg::Vector3 & msg);
 
 msg::Vector3 make_vector3_xy(const keisan::Point2 & point);
 keisan::Point2 extract_vector3_xy(const msg::Vector3 & msg);
+
+msg::Odometry make_odometry(const msg::TransformStamped & transform_stamped);
+msg::TransformStamped make_transform_stamped(const msg::Odometry & odometry);
 
 }  // namespace tosshin
 

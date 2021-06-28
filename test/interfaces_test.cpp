@@ -93,3 +93,40 @@ TEST(InterfacesTest, Odometry)
     odometry.twist = twist_with_covariance;
   }
 }
+
+TEST(InterfacesTest, TFMessage)
+{
+  tosshin::msg::TFMessage tf_message;
+  {
+    tosshin::msg::TransformStamped transform_stamped;
+    {
+      transform_stamped.header.stamp.sec = 0;
+      transform_stamped.header.stamp.nanosec = 0;
+      transform_stamped.header.frame_id = "odom";
+      transform_stamped.child_frame_id = "base_footprint";
+
+      tosshin::msg::Transform transform;
+      {
+        tosshin::msg::Vector3 translation;
+        {
+          translation.x = 0.0;
+          translation.y = 0.0;
+          translation.z = 0.0;
+        }
+
+        tosshin::msg::Quaternion rotation;
+        {
+          rotation.x = 0.0;
+          rotation.y = 0.0;
+          rotation.z = 0.0;
+          rotation.w = 0.0;
+        }
+
+        transform.translation = translation;
+        transform.rotation = rotation;
+      }
+
+      transform_stamped.transform = transform;
+    }
+  }
+}
