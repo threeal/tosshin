@@ -106,4 +106,42 @@ ksn::Point2 extract_vector3_xy(const msg::Vector3 & msg)
   return ksn::Point2(msg.x, msg.y);
 }
 
+msg::Odometry make_odometry(const msg::TransformStamped & transform_stamped)
+{
+  msg::Odometry odometry;
+
+  odometry.header = transform_stamped.header;
+  odometry.child_frame_id = transform_stamped.child_frame_id;
+
+  auto & position = odometry.pose.pose.position;
+  auto & translation = transform_stamped.transform.translation;
+
+  position.x = translation.x;
+  position.y = translation.y;
+  position.z = translation.z;
+
+  odometry.pose.pose.orientation = transform_stamped.transform.rotation;
+
+  return odometry;
+}
+
+msg::TransformStamped make_transform_stamped(const msg::Odometry & odometry)
+{
+  msg::TransformStamped transform_stamped;
+
+  transform_stamped.header = odometry.header;
+  transform_stamped.child_frame_id = odometry.child_frame_id;
+
+  auto & translation = transform_stamped.transform.translation;
+  auto & position = odometry.pose.pose.position;
+
+  translation.x = position.x;
+  translation.y = position.y;
+  translation.z = position.z;
+
+  transform_stamped.transform.rotation = odometry.pose.pose.orientation;
+
+  return transform_stamped;
+}
+
 }  // namespace tosshin

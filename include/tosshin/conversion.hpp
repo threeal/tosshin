@@ -43,6 +43,9 @@ keisan::Point3 extract_vector3(const msg::Vector3 & msg);
 msg::Vector3 make_vector3_xy(const keisan::Point2 & point);
 keisan::Point2 extract_vector3_xy(const msg::Vector3 & msg);
 
+msg::Odometry make_odometry(const msg::TransformStamped & transform_stamped);
+msg::TransformStamped make_transform_stamped(const msg::Odometry & odometry);
+
 }  // namespace tosshin
 
 #endif  // TOSSHIN__CONVERSION_HPP_
