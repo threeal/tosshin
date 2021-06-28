@@ -25,7 +25,7 @@
 namespace ksn = keisan;
 namespace tsn = tosshin;
 
-TEST(ConversionTest, MakePoint)
+TEST(ConversionTest, MakePointFromKeisanPoint)
 {
   ksn::Point3 point(1.0, 2.0, 3.0);
   auto msg = tsn::make_point(point);
@@ -33,6 +33,21 @@ TEST(ConversionTest, MakePoint)
   ASSERT_DOUBLE_EQ(msg.x, point.x);
   ASSERT_DOUBLE_EQ(msg.y, point.y);
   ASSERT_DOUBLE_EQ(msg.z, point.z);
+}
+
+TEST(ConversionTest, MakePointFromVector3)
+{
+  tsn::msg::Vector3 vector3;
+
+  vector3.x = 1.0;
+  vector3.y = 2.0;
+  vector3.z = 3.0;
+
+  auto point = tsn::make_point(vector3);
+
+  ASSERT_DOUBLE_EQ(point.x, vector3.x);
+  ASSERT_DOUBLE_EQ(point.y, vector3.y);
+  ASSERT_DOUBLE_EQ(point.z, vector3.z);
 }
 
 TEST(ConversionTest, ExtractPoint)
@@ -101,7 +116,7 @@ TEST(ConversionTest, ExtractQuaternion)
   ASSERT_DOUBLE_EQ(quaternion.w, msg.w);
 }
 
-TEST(ConversionTest, MakeVector3)
+TEST(ConversionTest, MakeVector3FromKeisanPoint)
 {
   ksn::Point3 point(1.0, 2.0, 3.0);
   auto msg = tsn::make_vector3(point);
@@ -109,6 +124,21 @@ TEST(ConversionTest, MakeVector3)
   ASSERT_DOUBLE_EQ(msg.x, point.x);
   ASSERT_DOUBLE_EQ(msg.y, point.y);
   ASSERT_DOUBLE_EQ(msg.z, point.z);
+}
+
+TEST(ConversionTest, MakeVector3FromPoint)
+{
+  tsn::msg::Point point;
+
+  point.x = 1.0;
+  point.y = 2.0;
+  point.z = 3.0;
+
+  auto vector3 = tsn::make_vector3(point);
+
+  ASSERT_DOUBLE_EQ(vector3.x, point.x);
+  ASSERT_DOUBLE_EQ(vector3.y, point.y);
+  ASSERT_DOUBLE_EQ(vector3.z, point.z);
 }
 
 TEST(ConversionTest, ExtractVector3)

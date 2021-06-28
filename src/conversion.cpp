@@ -36,6 +36,17 @@ msg::Point make_point(const ksn::Point3 & point)
   return msg;
 }
 
+msg::Point make_point(const msg::Vector3 & vector3)
+{
+  msg::Point point;
+
+  point.x = vector3.x;
+  point.y = vector3.y;
+  point.z = vector3.z;
+
+  return point;
+}
+
 ksn::Point3 extract_point(const msg::Point & msg)
 {
   return ksn::Point3(msg.x, msg.y, msg.z);
@@ -85,6 +96,17 @@ msg::Vector3 make_vector3(const ksn::Point3 & point)
   return msg;
 }
 
+msg::Vector3 make_vector3(const msg::Point & point)
+{
+  msg::Vector3 vector3;
+
+  vector3.x = point.x;
+  vector3.y = point.y;
+  vector3.z = point.z;
+
+  return vector3;
+}
+
 ksn::Point3 extract_vector3(const msg::Vector3 & msg)
 {
   return ksn::Point3(msg.x, msg.y, msg.z);
@@ -120,6 +142,7 @@ msg::Odometry make_odometry(const msg::TransformStamped & transform_stamped)
   position.y = translation.y;
   position.z = translation.z;
 
+  odometry.pose.pose.position = make_point(transform_stamped.transform.translation);
   odometry.pose.pose.orientation = transform_stamped.transform.rotation;
 
   return odometry;
@@ -131,14 +154,7 @@ msg::TransformStamped make_transform_stamped(const msg::Odometry & odometry)
 
   transform_stamped.header = odometry.header;
   transform_stamped.child_frame_id = odometry.child_frame_id;
-
-  auto & translation = transform_stamped.transform.translation;
-  auto & position = odometry.pose.pose.position;
-
-  translation.x = position.x;
-  translation.y = position.y;
-  translation.z = position.z;
-
+  transform_stamped.transform.translation = make_vector3(odometry.pose.pose.position);
   transform_stamped.transform.rotation = odometry.pose.pose.orientation;
 
   return transform_stamped;
