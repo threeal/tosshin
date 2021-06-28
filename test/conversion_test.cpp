@@ -148,3 +148,69 @@ TEST(ConversionTest, ExtractVector3XY)
   ASSERT_DOUBLE_EQ(point.x, msg.x);
   ASSERT_DOUBLE_EQ(point.y, msg.y);
 }
+
+TEST(ConversionTest, MakeOdometryFromTransformStamped)
+{
+  tsn::msg::TransformStamped transform_stamped;
+
+  transform_stamped.header.stamp.sec = 10;
+  transform_stamped.header.stamp.nanosec = 100;
+  transform_stamped.header.frame_id = "foo";
+  transform_stamped.child_frame_id = "goo";
+
+  transform_stamped.transform.translation = tsn::make_vector3({1.0, 2.0, 3.0});
+  transform_stamped.transform.rotation = tsn::make_quaternion({4.0, 5.0, 6.0, 7.0});
+
+  auto odometry = tsn::make_odometry(transform_stamped);
+
+  ASSERT_EQ(odometry.header, transform_stamped.header);
+  ASSERT_EQ(odometry.child_frame_id, transform_stamped.child_frame_id);
+
+  const auto & position = odometry.pose.pose.position;
+  const auto & translation = transform_stamped.transform.translation;
+
+  ASSERT_DOUBLE_EQ(position.x, translation.x);
+  ASSERT_DOUBLE_EQ(position.y, translation.y);
+  ASSERT_DOUBLE_EQ(position.z, translation.z);
+
+  const auto & orientation = odometry.pose.pose.orientation;
+  const auto & rotation = transform_stamped.transform.rotation;
+
+  ASSERT_DOUBLE_EQ(orientation.x, rotation.x);
+  ASSERT_DOUBLE_EQ(orientation.y, rotation.y);
+  ASSERT_DOUBLE_EQ(orientation.z, rotation.z);
+  ASSERT_DOUBLE_EQ(orientation.w, rotation.w);
+}
+
+TEST(ConversionTest, MakeTransformStampedFromOdometry)
+{
+  tsn::msg::Odometry odometry;
+
+  odometry.header.stamp.sec = 10;
+  odometry.header.stamp.nanosec = 100;
+  odometry.header.frame_id = "foo";
+  odometry.child_frame_id = "goo";
+
+  odometry.pose.pose.position = tsn::make_point({1.0, 2.0, 3.0});
+  odometry.pose.pose.orientation = tsn::make_quaternion({4.0, 5.0, 6.0, 7.0});
+
+  auto transform_stamped = tsn::make_transform_stamped(odometry);
+
+  ASSERT_EQ(transform_stamped.header, odometry.header);
+  ASSERT_EQ(transform_stamped.child_frame_id, odometry.child_frame_id);
+
+  const auto & translation = transform_stamped.transform.translation;
+  const auto & position = odometry.pose.pose.position;
+
+  ASSERT_DOUBLE_EQ(translation.x, position.x);
+  ASSERT_DOUBLE_EQ(translation.y, position.y);
+  ASSERT_DOUBLE_EQ(translation.z, position.z);
+
+  const auto & rotation = transform_stamped.transform.rotation;
+  const auto & orientation = odometry.pose.pose.orientation;
+
+  ASSERT_DOUBLE_EQ(rotation.x, orientation.x);
+  ASSERT_DOUBLE_EQ(rotation.y, orientation.y);
+  ASSERT_DOUBLE_EQ(rotation.z, orientation.z);
+  ASSERT_DOUBLE_EQ(rotation.w, orientation.w);
+}
